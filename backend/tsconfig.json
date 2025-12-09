@@ -24,9 +24,10 @@
       "@lib/*": ["lib/*"]
     },
 
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+
     "noEmitOnError": false
   },
-
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

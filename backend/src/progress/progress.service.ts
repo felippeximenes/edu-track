@@ -1,43 +1,11 @@
-import { prisma } from "../lib/prisma";
-import { ProgressDTO } from "./progress.dto";
+import prisma from "../config/prismaClient";
 
 export class ProgressService {
-  async markLessonCompleted(userId: number, data: ProgressDTO) {
-    const lesson = await prisma.lesson.findUnique({
-      where: { id: data.lessonId },
-      include: {
-        module: true,
-        course: true,
-      },
-    });
-
-    if (!lesson) throw new Error("Lesson not found");
-
-    // Check if user is enrolled
-    const enrollment = await prisma.enrollment.findFirst({
-      where: {
-        userId,
-        courseId: lesson.courseId,
-      },
-    });
-
-    if (!enrollment)
-      throw new Error("User is not enrolled in this course");
-
-    // Prevent duplicate progress
-    const existing = await prisma.lessonProgress.findFirst({
-      where: {
-        userId,
-        lessonId: data.lessonId,
-      },
-    });
-
-    if (existing) return existing;
-
+  async complete(userId: number, lessonId: number) {
     return prisma.lessonProgress.create({
       data: {
         userId,
-        lessonId: data.lessonId,
+        lessonId,
       },
     });
   }
@@ -48,7 +16,7 @@ export class ProgressService {
       include: {
         lessons: {
           include: {
-            progresses: {
+            progress: {
               where: { userId },
             },
           },
@@ -56,37 +24,33 @@ export class ProgressService {
       },
     });
 
-    const allLessons = modules.flatMap((m) => m.lessons);
+    const totalLessons = modules.reduce(
+      (sum, m) => sum + m.lessons.length,
+      0
+    );
 
-    const totalLessons = allLessons.length;
-    const completedLessons = allLessons.filter(
-      (l) => l.progresses.length > 0
-    ).length;
+    const completedLessons = modules.reduce(
+      (sum, m) =>
+        sum + m.lessons.filter((l) => l.progress.length > 0).length,
+      0
+    );
 
-    const coursePercentage =
-      totalLessons === 0
-        ? 0
-        : Math.round((completedLessons / totalLessons) * 100);
-
-    const modulesProgress = modules.map((module) => {
-      const total = module.lessons.length;
-      const done = module.lessons.filter((l) => l.progresses.length > 0).length;
-
-      return {
-        moduleId: module.id,
-        moduleTitle: module.title,
-        totalLessons: total,
-        completedLessons: done,
-        percentage: total === 0 ? 0 : Math.round((done / total) * 100),
-      };
-    });
+    const progressPercentage =
+      totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
     return {
       courseId,
-      totalLessons,
       completedLessons,
-      percentage: coursePercentage,
-      modules: modulesProgress,
+      totalLessons,
+      progressPercentage,
+      modules: modules.map((m) => ({
+        moduleId: m.id,
+        title: m.title,
+        completedLessons: m.lessons.filter(
+          (l) => l.progress.length > 0
+        ).length,
+        totalLessons: m.lessons.length,
+      })),
     };
   }
 }

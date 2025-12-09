@@ -6,7 +6,6 @@ import { requireRole } from "../auth/role.middleware";
 const router = Router();
 const controller = new ProgressController();
 
-// marcar aula como concluída
 router.post(
   "/complete",
   authMiddleware,
@@ -14,7 +13,6 @@ router.post(
   controller.complete
 );
 
-// progresso de um curso (por módulos e total)
 router.get(
   "/course/:courseId",
   authMiddleware,

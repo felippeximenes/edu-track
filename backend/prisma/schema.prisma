@@ -7,18 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String
-  email    String   @unique
-  password String
-  role     Role
-  courses        Course[]         @relation("InstructorCourses")
-  enrollments    Enrollment[]
-  lessonProgress LessonProgress[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  courses     Course[]         @relation("InstructorCourses")
+  enrollments Enrollment[]
+  progress    LessonProgress[]
+  Certificate Certificate[]
 }
 
 model Course {
@@ -26,34 +33,14 @@ model Course {
   title        String
   description  String
   instructorId Int
-  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [id])
-  lessons      Lesson[]
-  modules      Module[]
-  enrollments  Enrollment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-model Module {
-  id       Int      @id @default(autoincrement())
-  title    String
-  courseId Int
-  course   Course   @relation(fields: [courseId], references: [id])
-  lessons  Lesson[]
-}
-
-model Lesson {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  videoUrl  String?
-  courseId  Int
-  moduleId  Int?
-  course    Course   @relation(fields: [courseId], references: [id])
-  module    Module?  @relation(fields: [moduleId], references: [id])
-  progresses LessonProgress[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  instructor  User          @relation("InstructorCourses", fields: [instructorId], references: [id])
+  enrollments Enrollment[]
+  lessons     Lesson[]
+  modules     Module[]
+  Certificate Certificate[]
 }
 
 model Enrollment {
@@ -61,8 +48,33 @@ model Enrollment {
   userId    Int
   courseId  Int
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  course    Course   @relation(fields: [courseId], references: [id])
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+}
+
+model Module {
+  id       Int    @id @default(autoincrement())
+  title    String
+  courseId Int
+
+  course  Course   @relation(fields: [courseId], references: [id])
+  lessons Lesson[]
+}
+
+model Lesson {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  videoUrl  String
+  courseId  Int
+  moduleId  Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  course   Course           @relation(fields: [courseId], references: [id])
+  module   Module?          @relation(fields: [moduleId], references: [id])
+  progress LessonProgress[]
 }
 
 model LessonProgress {
@@ -70,11 +82,22 @@ model LessonProgress {
   userId      Int
   lessonId    Int
   completedAt DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id])
-  lesson      Lesson   @relation(fields: [lessonId], references: [id])
+
+  user   User   @relation(fields: [userId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
 }
 
-enum Role {
-  STUDENT
-  INSTRUCTOR
+model Certificate {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  courseId  Int
+  issuedAt  DateTime @default(now())
+  code      String   @unique
+
+  user      User     @relation(fields: [userId], references: [id])
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  @@index([userId])
+  @@index([courseId])
 }
+

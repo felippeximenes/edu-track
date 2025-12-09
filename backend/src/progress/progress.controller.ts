@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { progressSchema } from "./progress.dto";
 import { ProgressService } from "./progress.service";
 
 const progressService = new ProgressService();
@@ -7,36 +6,36 @@ const progressService = new ProgressService();
 export class ProgressController {
   async complete(req: Request, res: Response) {
     try {
-      const user = (req as any).user;
+      // depende do seu authMiddleware – use o que você já usa no resto:
+      const userId = (req as any).user.id; // ou req.user.id se for o caso
+      const { lessonId } = req.body;
 
-      const data = progressSchema.parse(req.body);
+      if (!lessonId) {
+        return res.status(400).json({ error: "lessonId is required" });
+      }
 
-      const result = await progressService.markLessonCompleted(
-        user.id,
-        data
-      );
-
-      return res.status(201).json(result);
-
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message });
+      const progress = await progressService.complete(userId, lessonId);
+      return res.status(201).json(progress);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to mark lesson as completed" });
     }
   }
 
   async getCourseProgress(req: Request, res: Response) {
     try {
-      const user = (req as any).user;
+      const userId = (req as any).user.id; // mesmo esquema do de cima
       const courseId = Number(req.params.courseId);
 
-      const result = await progressService.getCourseProgress(
-        user.id,
-        courseId
-      );
+      if (isNaN(courseId)) {
+        return res.status(400).json({ error: "Invalid courseId" });
+      }
 
-      return res.json(result);
-
-    } catch (err: any) {
-      return res.status(400).json({ error: err.message });
+      const data = await progressService.getCourseProgress(userId, courseId);
+      return res.json(data);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to fetch course progress" });
     }
   }
 }
