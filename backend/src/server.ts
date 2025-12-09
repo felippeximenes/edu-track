@@ -1,15 +1,18 @@
 import express from "express";
+import cors from "cors";
+
+import authRoutes from "./auth/auth.routes";
+import courseRoutes from "./courses/course.routes";
+import lessonRoutes from "./lessons/lesson.routes";
+import moduleRoutes from "./modules/module.routes";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-
+app.use(cors());
 app.use(express.json());
 
-// Rota de health check (para mostrar que o servidor está no ar)
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", message: "Edu Track API is running" });
-});
+app.use("/auth", authRoutes);
+app.use("/courses", courseRoutes);
+app.use("/lessons", lessonRoutes);
+app.use("/modules", moduleRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+app.listen(3001, () => console.log("Server running on port 3001"));
