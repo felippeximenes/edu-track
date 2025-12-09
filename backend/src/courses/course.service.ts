@@ -4,11 +4,15 @@ import { CreateCourseDTO, UpdateCourseDTO } from "./course.dto";
 export class CourseService {
   async createCourse(instructorId: number, data: CreateCourseDTO) {
     return prisma.course.create({
-      data: {
-        ...data,
-        instructorId,
-      },
-    });
+  data: {
+    title: data.title,
+    description: data.description,
+    instructor: {
+      connect: { id: instructorId }
+    }
+  }
+});
+
   }
 
   async getAllCourses() {

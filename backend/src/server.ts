@@ -5,6 +5,8 @@ import authRoutes from "./auth/auth.routes";
 import courseRoutes from "./courses/course.routes";
 import lessonRoutes from "./lessons/lesson.routes";
 import moduleRoutes from "./modules/module.routes";
+import enrollmentRoutes from "./enrollment/enrollment.routes";
+import progressRoutes from "./progress/progress.routes";
 
 
 const app = express();
@@ -15,6 +17,8 @@ app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/lessons", lessonRoutes);
 app.use("/modules", moduleRoutes);
+app.use("/enrollment", enrollmentRoutes);
+app.use("/progress", progressRoutes);
 
 
 app.listen(3001, () => console.log("Server running on port 3001"));
