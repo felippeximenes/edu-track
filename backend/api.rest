@@ -1,0 +1,154 @@
+
+
+###############################################
+# AUTH
+###############################################
+
+### Registrar aluno
+POST http://localhost:3001/auth/register
+Content-Type: application/json
+
+{
+  "name": "Novo Aluno",
+  "email": "aluno@example.com",
+  "password": "123456",
+  "role": "STUDENT"
+}
+
+### Registrar professor
+POST http://localhost:3001/auth/register
+Content-Type: application/json
+
+{
+  "name": "Professor Novo",
+  "email": "prof@example.com",
+  "password": "123456",
+  "role": "INSTRUCTOR"
+}
+
+### Login aluno
+POST http://localhost:3001/auth/login
+Content-Type: application/json
+
+{
+  "email": "aluno@example.com",
+  "password": "123456"
+}
+
+### Login professor
+POST http://localhost:3001/auth/login
+Content-Type: application/json
+
+{
+  "email": "prof@example.com",
+  "password": "123456"
+}
+
+################################################
+# COPIE O TOKEN LOGIN ALUNO E PROFESSOR
+# COLE AQUI PARA TESTAR AS ROTAS PRIVADAS
+################################################
+
+@token_professor = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6IklOU1RSVUNUT1IiLCJpYXQiOjE3NjUzMDQzMTQsImV4cCI6MTc2NTM5MDcxNH0.rxftVnVEPM1022OBzEeNq1sT8LzyF3mnQO2LFWfjsFs
+@token_aluno = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NjUzMTEyMDIsImV4cCI6MTc2NTM5NzYwMn0.UA_TGbK_HtnkyX94ToSPaevtDkU7fVFCbff9ToMpO-0
+
+################################################
+# COURSES
+################################################
+
+### Criar curso (APENAS PROFESSOR)
+POST http://localhost:3001/courses
+Authorization: Bearer {{tokenProfessor}}
+Content-Type: application/json
+
+{
+  "title": "Curso API Teste",
+  "description": "Descrição do curso via REST",
+  "instructorId": 2
+}
+
+### Listar todos os cursos
+GET http://localhost:3001/courses
+Authorization: Bearer {{tokenAluno}}
+
+################################################
+# MODULES
+################################################
+
+### Criar módulo no curso 1
+POST http://localhost:3001/modules
+Authorization: Bearer {{tokenProfessor}}
+Content-Type: application/json
+
+{
+  "title": "Módulo 1",
+  "courseId": 1
+}
+
+### Listar módulos do curso 1
+GET http://localhost:3001/modules/course/1
+Authorization: Bearer {{tokenAluno}}
+
+################################################
+# LESSONS
+################################################
+
+### Criar aula no módulo 1
+POST http://localhost:3001/lessons
+Authorization: Bearer {{tokenProfessor}}
+Content-Type: application/json
+
+{
+  "title": "Aula 1",
+  "content": "Conteúdo da aula via REST",
+  "videoUrl": "https://youtube.com/test",
+  "courseId": 1,
+  "moduleId": 1
+}
+
+### Listar aulas do curso
+GET http://localhost:3001/lessons/course/1
+Authorization: Bearer {{tokenAluno}}
+
+################################################
+# PROGRESS
+################################################
+
+### Marcar progresso do aluno na aula 1
+POST http://localhost:3001/progress
+Authorization: Bearer {{tokenAluno}}
+Content-Type: application/json
+
+{
+  "lessonId": 1
+}
+
+### Ver progresso do aluno
+GET http://localhost:3001/progress
+Authorization: Bearer {{tokenAluno}}
+
+################################################
+# CERTIFICATES
+################################################
+
+### Emitir certificado (ALUNO)
+POST http://localhost:3001/certificates/issue
+Authorization: Bearer {{tokenAluno}}
+Content-Type: application/json
+
+{
+  "courseId": 1
+}
+
+### Listar certificados do usuário
+GET http://localhost:3001/certificates
+Authorization: Bearer {{tokenAluno}}
+
+### Buscar certificado do curso 1
+GET http://localhost:3001/certificates/course/1
+Authorization: Bearer {{tokenAluno}}
+
+### Gerar PDF do certificado ID 1
+GET http://localhost:3001/certificates/1/pdf
+Authorization: Bearer {{tokenAluno}}
+
