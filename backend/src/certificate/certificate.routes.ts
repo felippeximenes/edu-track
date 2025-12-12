@@ -1,20 +1,28 @@
 import { Router } from "express";
-import CertificateController from "./certificate.controller";
-import { authMiddleware } from "../auth/auth.middleware";    // ✅ correção
-import { requireRole } from "../auth/role.middleware";        // ✅ correção
+import { CertificateController } from "./certificate.controller";
+import { authMiddleware } from "../auth/auth.middleware";
+import { requireRole } from "../auth/role.middleware";
 
 const router = Router();
 const controller = new CertificateController();
 
-// Emitir certificado (somente instrutor)
+/*
+|--------------------------------------------------------------------------
+| 1. Emitir certificado (instrutor)
+|--------------------------------------------------------------------------
+*/
 router.post(
-  "/issue",
+  "/issue/:courseId",
   authMiddleware,
   requireRole("INSTRUCTOR"),
   controller.issue
 );
 
-// Listar certificados do aluno logado
+/*
+|--------------------------------------------------------------------------
+| 2. Listar certificados do aluno autenticado
+|--------------------------------------------------------------------------
+*/
 router.get(
   "/",
   authMiddleware,
@@ -22,7 +30,11 @@ router.get(
   controller.getByUser
 );
 
-// Buscar certificado do aluno logado por curso
+/*
+|--------------------------------------------------------------------------
+| 3. Buscar certificado de um curso específico (aluno)
+|--------------------------------------------------------------------------
+*/
 router.get(
   "/course/:courseId",
   authMiddleware,
@@ -30,7 +42,11 @@ router.get(
   controller.getByCourse
 );
 
-// Gerar PDF autenticado (somente aluno logado)
+/*
+|--------------------------------------------------------------------------
+| 4. Gerar PDF e abrir no navegador (rota protegida)
+|--------------------------------------------------------------------------
+*/
 router.get(
   "/:certificateId/pdf",
   authMiddleware,
@@ -38,10 +54,18 @@ router.get(
   controller.generatePDF
 );
 
-// 🎯 ROTA PÚBLICA — PDF direto no navegador usando código único
-router.get(
-  "/public/:code",
-  controller.viewPublic
-);
+/*
+|--------------------------------------------------------------------------
+| 5. Rota pública — visualizar dados do certificado via code (JSON)
+|--------------------------------------------------------------------------
+*/
+router.get("/public/:code", controller.viewPublic);
+
+/*
+|--------------------------------------------------------------------------
+| 6. Rota pública — abrir PDF direto no navegador SEM token
+|--------------------------------------------------------------------------
+*/
+router.get("/public/:code/pdf", controller.generatePDFPublic);
 
 export default router;

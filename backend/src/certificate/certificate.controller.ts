@@ -1,81 +1,97 @@
+// src/certificates/certificate.controller.ts
 import { Request, Response } from "express";
 import { CertificateService } from "./certificate.service";
 
 const service = new CertificateService();
 
 export class CertificateController {
-
-  // Emitir certificado (instrutor)
+  // Emitir certificado (instrutor / aluno após concluir)
   async issue(req: Request, res: Response) {
-    const { courseId, userId } = req.body;
-
-    const certificate = await service.issueCertificate(userId, courseId);
-    res.status(201).json(certificate);
-  }
-
-  // Buscar certificados do usuário logado (aluno)
-  async getByUser(req: Request, res: Response) {
-    const userId = req.user.id;
-    const certificates = await service.getCertificatesByUser(userId);
-    res.json(certificates);
-  }
-
-  // Buscar certificado do usuário logado por curso
-  async getByCourse(req: Request, res: Response) {
-    const { courseId } = req.params;
-    const userId = req.user.id;
-
-    const certificates = await service.getUserCertificateForCourse(
-      userId,
-      Number(courseId)
-    );
-
-    res.json(certificates);
-  }
-
-  // Gerar PDF autenticado (rota protegida)
-  async generatePDF(req: Request, res: Response) {
-    const { certificateId } = req.params;
-
     try {
-      const pdfBuffer = await service.generateCertificatePDF(Number(certificateId));
+      const userId = req.user!.id;
+      const courseId = Number(req.params.courseId);
 
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", "inline; filename=certificado.pdf");
-      res.setHeader("Content-Length", pdfBuffer.length);
-
-      return res.send(pdfBuffer);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao gerar PDF" });
+      const cert = await service.issueCertificate(userId, courseId);
+      return res.json(cert);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
     }
   }
 
-  // ✅ ROTA PÚBLICA PARA ABRIR PDF PELO CÓDIGO
-  async viewPublic(req: Request, res: Response) {
-    const { code } = req.params;
-
+  // Buscar certificados do aluno autenticado
+  async getByUser(req: Request, res: Response) {
     try {
-      const certificate = await service.getByCode(code);
+      const userId = req.user!.id;
+      const list = await service.getCertificatesByUser(userId);
+      return res.json(list);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
 
-      if (!certificate) {
+  // Buscar certificado de um curso específico (aluno)
+  async getByCourse(req: Request, res: Response) {
+    try {
+      const userId = req.user!.id;
+      const courseId = Number(req.params.courseId);
+
+      const cert = await service.getUserCertificateForCourse(userId, courseId);
+      return res.json(cert);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  // 🔥 GERAR PDF (rota protegida — exige token)
+  async generatePDF(req: Request, res: Response) {
+    try {
+      const certId = Number(req.params.certificateId);
+
+      const pdf = await service.generateCertificatePDF(certId);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "inline; filename=certificado.pdf");
+
+      return res.send(pdf);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  // 🔥 ROTA PÚBLICA — ABRIR PDF NO NAVEGADOR USANDO O CODE (sem token)
+  async generatePDFPublic(req: Request, res: Response) {
+    try {
+      const code = req.params.code;
+
+      const cert = await service.getByCode(code);
+      if (!cert) {
+        return res.status(404).json({ error: "Certificado não encontrado." });
+      }
+
+      const pdf = await service.generateCertificatePDF(cert.id);
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "inline; filename=certificado.pdf");
+
+      return res.send(pdf);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
+    }
+  }
+
+  // Visualizar dados do certificado sem PDF (JSON público)
+  async viewPublic(req: Request, res: Response) {
+    try {
+      const code = req.params.code;
+      const cert = await service.getByCode(code);
+
+      if (!cert) {
         return res.status(404).send("Certificado não encontrado.");
       }
 
-      // Gera PDF pelo ID do certificado
-      const pdfBuffer = await service.generateCertificatePDF(certificate.id);
-
-      res.setHeader("Content-Type", "application/pdf");
-      res.setHeader("Content-Disposition", "inline; filename=certificado.pdf");
-      res.setHeader("Content-Length", pdfBuffer.length);
-
-      return res.send(pdfBuffer);
-
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "Erro ao exibir certificado público" });
+      return res.json(cert);
+    } catch (err: any) {
+      return res.status(400).json({ error: err.message });
     }
   }
 }
-
-export default CertificateController;

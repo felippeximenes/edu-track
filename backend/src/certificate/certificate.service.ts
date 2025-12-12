@@ -1,11 +1,13 @@
+// src/certificates/certificate.service.ts
 import prisma from "../config/prismaClient";
 import crypto from "crypto";
-import puppeteer from "puppeteer";
-import { certificateHTML } from "./certificateTemplate";
 import QRCode from "qrcode";
+import { generatePdfFromHtml } from "../utils/generatePdf";
+
+
+import { certificateHTML } from "./certificateTemplate";
 
 export class CertificateService {
-
   async hasCompletedCourse(userId: number, courseId: number) {
     const totalLessons = await prisma.lesson.count({
       where: { courseId },
@@ -69,8 +71,8 @@ export class CertificateService {
     });
   }
 
-  // 🔥 Gerar PDF com QR code
-  async generateCertificatePDF(certificateId: number) {
+  // 🔥 Gerar PDF com QR code (usando Playwright via helper)
+  async generateCertificatePDF(certificateId: number): Promise<Buffer> {
     const certificate = await prisma.certificate.findUnique({
       where: { id: certificateId },
       include: { user: true, course: true },
@@ -78,34 +80,27 @@ export class CertificateService {
 
     if (!certificate) throw new Error("Certificado não encontrado.");
 
-    // URL pública
-    const publicUrl = `http://localhost:3001/certificates/public/${certificate.code}`;
+    // Ideal: usar variável de ambiente em vez de localhost fixo
+    const baseUrl = process.env.APP_URL || "http://localhost:3001";
 
-    // QR Code base64
+    // URL pública que vai no QR Code
+    const publicUrl = `${baseUrl}/certificates/public/${certificate.code}`;
+
+    // QR Code em base64 (data:image/png;base64,...)
     const qrCodeDataURL = await QRCode.toDataURL(publicUrl);
 
-    // HTML com QR Code
+    // Monta HTML a partir do template
     const html = certificateHTML({
       student: certificate.user.name,
       course: certificate.course.title,
       date: certificate.issuedAt.toLocaleDateString("pt-BR"),
       code: certificate.code,
-      qr: qrCodeDataURL, // agora válido!
+      qr: qrCodeDataURL,
     });
 
-    const browser = await puppeteer.launch({
-      headless: true, // compatível com sua versão
-    });
+    // Gera o PDF a partir do HTML
+    const pdfBuffer = await generatePdfFromHtml(html);
 
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
-
-    const pdfBuffer = await page.pdf({
-      format: "A4",
-      printBackground: true,
-    });
-
-    await browser.close();
     return pdfBuffer;
   }
 }

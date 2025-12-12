@@ -50,7 +50,7 @@ Content-Type: application/json
 ################################################
 
 @token_professor = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6IklOU1RSVUNUT1IiLCJpYXQiOjE3NjUzMDQzMTQsImV4cCI6MTc2NTM5MDcxNH0.rxftVnVEPM1022OBzEeNq1sT8LzyF3mnQO2LFWfjsFs
-@token_aluno = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NjUzMTEyMDIsImV4cCI6MTc2NTM5NzYwMn0.UA_TGbK_HtnkyX94ToSPaevtDkU7fVFCbff9ToMpO-0
+@token_aluno = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywicm9sZSI6IlNUVURFTlQiLCJpYXQiOjE3NjU1NDEyMTUsImV4cCI6MTc2NTYyNzYxNX0.ruzw6-gg9qF2GRM9dM4jV_NHK6sdFmrBqkIpSp7irAk
 
 ################################################
 # COURSES
