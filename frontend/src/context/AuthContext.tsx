@@ -1,6 +1,12 @@
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+// src/context/AuthContext.tsx
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 import { api } from "../api/axios";
-
 
 interface User {
   id: number;
@@ -34,8 +40,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(false);
   }, []);
 
-  // Função de login real usando sua API
-  async function login(email: string, password: string) {
+  // 🔥 Função de login real usando sua API
+  async function login(email: string, password: string): Promise<boolean> {
     try {
       const res = await api.post("/auth/login", { email, password });
 

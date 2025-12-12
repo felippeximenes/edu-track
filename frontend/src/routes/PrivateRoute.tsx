@@ -1,9 +1,9 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 
 interface PrivateRouteProps {
-  children: ReactNode;
+  children: ReactElement; // ← funciona sempre
 }
 
 export default function PrivateRoute({ children }: PrivateRouteProps) {
