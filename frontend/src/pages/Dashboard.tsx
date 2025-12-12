@@ -37,7 +37,6 @@ export default function Dashboard() {
   }, []);
 
   function openCertificatePDF(code: string) {
-    // abre o PDF público em uma nova aba
     window.open(
       `http://localhost:3001/certificates/public/${code}/pdf`,
       "_blank"
@@ -49,15 +48,13 @@ export default function Dashboard() {
 
   return (
     <div style={styles.page}>
-      <Navbar />
+     
 
       <main style={styles.main}>
         {/* HEADER */}
         <section style={styles.headerRow}>
           <div>
-            <h1 style={styles.title}>
-              Olá, {user?.name || "Aluno"} 👋
-            </h1>
+            <h1 style={styles.title}>Olá, {user?.name} 👋</h1>
             <p style={styles.subtitle}>
               Bem-vindo ao seu painel EduTrack. Aqui você acompanha
               seus cursos e certificados.
@@ -65,8 +62,8 @@ export default function Dashboard() {
           </div>
         </section>
 
-        {/* CARDS RESUMO */}
-        <section style={styles.cardsRow}>
+        {/* CARDS RESUMO (RESPONSIVO) */}
+        <section className="responsive-grid" style={{ marginBottom: "32px" }}>
           <div style={styles.card}>
             <span style={styles.cardLabel}>Certificados conquistados</span>
             <strong style={styles.cardNumber}>{totalCertificates}</strong>
@@ -74,6 +71,7 @@ export default function Dashboard() {
 
           <div style={styles.card}>
             <span style={styles.cardLabel}>Último certificado</span>
+
             {lastCertificate ? (
               <>
                 <strong style={styles.cardNumber}>
@@ -108,7 +106,7 @@ export default function Dashboard() {
           )}
 
           {!loading && !error && certificates.length > 0 && (
-            <div style={styles.tableWrapper}>
+            <div className="table-responsive">
               <table style={styles.table}>
                 <thead>
                   <tr>
@@ -171,12 +169,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: "8px",
     color: "#6b7280",
   },
-  cardsRow: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-    gap: "16px",
-    marginBottom: "32px",
-  },
   card: {
     backgroundColor: "white",
     padding: "18px 20px",
@@ -216,9 +208,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     margin: 0,
     fontSize: "18px",
   },
-  tableWrapper: {
-    overflowX: "auto",
-  },
   table: {
     width: "100%",
     borderCollapse: "collapse",
@@ -239,7 +228,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   tdMono: {
     padding: "10px 8px",
     borderBottom: "1px solid #f3f4f6",
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas",
+    fontFamily: "ui-monospace",
     fontSize: "12px",
   },
   linkButton: {

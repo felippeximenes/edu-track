@@ -1,37 +1,32 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
+import PrivateRoute from "./PrivateRoute";
+
+import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import Certificates from "../pages/Certificates";
-import Login from "../pages/Login";
-import PrivateRoute from "./PrivateRoute";
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <Routes>
+      <Route path="/" element={<Login />} />
 
-        {/* Página pública */}
-        <Route path="/" element={<Login />} />
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
 
-        {/* Rotas protegidas */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/certificates"
-          element={
-            <PrivateRoute>
-              <Certificates />
-            </PrivateRoute>
-          }
-        />
-
-      </Routes>
-    </BrowserRouter>
+      <Route
+        path="/certificates"
+        element={
+          <PrivateRoute>
+            <Certificates />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
