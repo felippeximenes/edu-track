@@ -1,71 +1,62 @@
+// src/certificate/certificate.routes.ts
 import { Router } from "express";
 import { CertificateController } from "./certificate.controller";
 import { authMiddleware } from "../auth/auth.middleware";
-import { requireRole } from "../auth/role.middleware";
 
 const router = Router();
 const controller = new CertificateController();
 
-/*
+/*  
 |--------------------------------------------------------------------------
-| 1. Emitir certificado (instrutor)
+| ROTAS DE CERTIFICADO (PROTEGIDAS)
+|--------------------------------------------------------------------------
+| Todas as rotas abaixo exigem token JWT válido.
+| São usadas quando o aluno está logado e deseja visualizar,
+| emitir ou baixar seus próprios certificados.
 |--------------------------------------------------------------------------
 */
-router.post(
-  "/issue/:courseId",
-  authMiddleware,
-  requireRole("INSTRUCTOR"),
-  controller.issue
-);
 
-/*
-|--------------------------------------------------------------------------
-| 2. Listar certificados do aluno autenticado
-|--------------------------------------------------------------------------
-*/
-router.get(
-  "/",
-  authMiddleware,
-  requireRole("STUDENT"),
-  controller.getByUser
-);
+// 📌 Listar todos os certificados do aluno autenticado
+router.get("/", authMiddleware, controller.getByUser.bind(controller));
 
-/*
-|--------------------------------------------------------------------------
-| 3. Buscar certificado de um curso específico (aluno)
-|--------------------------------------------------------------------------
-*/
+// 📌 Buscar certificado de um curso específico do aluno
 router.get(
   "/course/:courseId",
   authMiddleware,
-  requireRole("STUDENT"),
-  controller.getByCourse
+  controller.getByCourse.bind(controller)
 );
 
-/*
-|--------------------------------------------------------------------------
-| 4. Gerar PDF e abrir no navegador (rota protegida)
-|--------------------------------------------------------------------------
-*/
-router.get(
-  "/:certificateId/pdf",
+// 📌 Emitir certificado (aluno concluiu o curso)
+router.post(
+  "/issue/:courseId",
   authMiddleware,
-  requireRole("STUDENT"),
-  controller.generatePDF
+  controller.issue.bind(controller)
 );
 
-/*
-|--------------------------------------------------------------------------
-| 5. Rota pública — visualizar dados do certificado via code (JSON)
-|--------------------------------------------------------------------------
-*/
-router.get("/public/:code", controller.viewPublic);
+// 📌 Gerar PDF autenticado (precisa token)
+router.get(
+  "/pdf/:certificateId",
+  authMiddleware,
+  controller.generatePDF.bind(controller)
+);
 
-/*
+/*  
 |--------------------------------------------------------------------------
-| 6. Rota pública — abrir PDF direto no navegador SEM token
+| ROTAS PÚBLICAS (SEM AUTENTICAÇÃO)
+|--------------------------------------------------------------------------
+| Qualquer pessoa pode abrir essas rotas:
+| - Ver dados do certificado via código (JSON)
+| - Abrir o PDF diretamente no navegador via código público
 |--------------------------------------------------------------------------
 */
-router.get("/public/:code/pdf", controller.generatePDFPublic);
+
+// 🔓 Visualizar dados do certificado via código público
+router.get("/public/:code", controller.viewPublic.bind(controller));
+
+// 🔓 Gerar e abrir PDF público no navegador (sem token)
+router.get(
+  "/public/:code/pdf",
+  controller.generatePDFPublic.bind(controller)
+);
 
 export default router;

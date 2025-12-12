@@ -1,11 +1,15 @@
-// src/certificates/certificate.controller.ts
+// src/certificate/certificate.controller.ts
+
 import { Request, Response } from "express";
 import { CertificateService } from "./certificate.service";
 
 const service = new CertificateService();
 
 export class CertificateController {
-  // Emitir certificado (instrutor / aluno após concluir)
+
+  // ======================================================
+  // 📌 1. Emitir certificado (instrutor ou aluno após concluir)
+  // ======================================================
   async issue(req: Request, res: Response) {
     try {
       const userId = req.user!.id;
@@ -18,7 +22,9 @@ export class CertificateController {
     }
   }
 
-  // Buscar certificados do aluno autenticado
+  // ======================================================
+  // 📌 2. Buscar todos os certificados do aluno autenticado
+  // ======================================================
   async getByUser(req: Request, res: Response) {
     try {
       const userId = req.user!.id;
@@ -29,7 +35,9 @@ export class CertificateController {
     }
   }
 
-  // Buscar certificado de um curso específico (aluno)
+  // ======================================================
+  // 📌 3. Buscar certificado de um curso específico
+  // ======================================================
   async getByCourse(req: Request, res: Response) {
     try {
       const userId = req.user!.id;
@@ -42,7 +50,9 @@ export class CertificateController {
     }
   }
 
-  // 🔥 GERAR PDF (rota protegida — exige token)
+  // ======================================================
+  // 📌 4. GERAR PDF protegido (requer token)
+  // ======================================================
   async generatePDF(req: Request, res: Response) {
     try {
       const certId = Number(req.params.certificateId);
@@ -58,7 +68,9 @@ export class CertificateController {
     }
   }
 
-  // 🔥 ROTA PÚBLICA — ABRIR PDF NO NAVEGADOR USANDO O CODE (sem token)
+  // ======================================================
+  // 📌 5. GERAR PDF público via código (sem token)
+  // ======================================================
   async generatePDFPublic(req: Request, res: Response) {
     try {
       const code = req.params.code;
@@ -79,7 +91,9 @@ export class CertificateController {
     }
   }
 
-  // Visualizar dados do certificado sem PDF (JSON público)
+  // ======================================================
+  // 📌 6. Rota pública para ver dados do certificado (JSON)
+  // ======================================================
   async viewPublic(req: Request, res: Response) {
     try {
       const code = req.params.code;
