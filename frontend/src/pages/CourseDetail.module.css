@@ -1,0 +1,227 @@
+.root { min-height: 100vh; background: var(--bg-deep); }
+
+.loading, .notFound {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 50vh; color: var(--text-secondary);
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hero */
+.hero {
+  position: relative;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.heroBg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at top left, rgba(99,102,241,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse at bottom right, rgba(6,182,212,0.08) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.heroContent {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+.backBtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 7px 14px;
+  color: var(--text-secondary); font-size: 13px; font-weight: 500;
+  transition: color 180ms var(--transition), background 180ms var(--transition);
+  margin-bottom: 28px;
+}
+.backBtn:hover { color: var(--text-primary); background: var(--surface-hover); }
+
+.heroBody {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 48px;
+  align-items: start;
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  background: rgba(99,102,241,0.1);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 999px;
+  font-size: 11px; font-weight: 600;
+  color: var(--primary);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.desc {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 28px;
+  max-width: 560px;
+}
+
+.stats {
+  display: flex; align-items: center; gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13px; color: var(--text-secondary);
+}
+
+.instructorAvatar {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--gradient-brand);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 10px; font-weight: 700;
+}
+
+/* Enrollment card */
+.enrollCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 32px 24px;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 12px;
+  position: sticky; top: 80px;
+  backdrop-filter: blur(12px);
+}
+
+.enrollIcon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(99,102,241,0.12);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+.enrollTitle { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+.enrollSub   { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
+
+.enrollBtn {
+  width: 100%; padding: 13px;
+  background: var(--gradient-brand);
+  border: none; border-radius: var(--radius);
+  color: #fff; font-size: 14px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity 200ms var(--transition), transform 150ms var(--transition);
+  box-shadow: 0 4px 20px var(--primary-glow);
+  min-height: 46px;
+}
+.enrollBtn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+.enrollBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.enrollBtnActive { background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 4px 20px rgba(16,185,129,0.25); }
+
+.btnSpinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+/* Content */
+.content {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+/* Module */
+.module {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  animation: fadeUp 0.35s var(--transition) both;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modHeader {
+  width: 100%; display: flex; align-items: center;
+  justify-content: space-between; gap: 16px;
+  padding: 18px 20px;
+  background: none; border: none;
+  cursor: pointer; text-align: left;
+  transition: background 180ms var(--transition);
+}
+.modHeader:hover { background: var(--surface-hover); }
+
+.modLeft { display: flex; align-items: center; gap: 14px; }
+
+.modNum {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(99,102,241,0.12);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: var(--primary);
+  flex-shrink: 0;
+}
+
+.modTitle { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.modCount { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.chevron { color: var(--text-muted); transition: transform 250ms var(--transition); }
+.chevron.open { transform: rotate(180deg); }
+
+/* Lessons */
+.lessons {
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column;
+}
+
+.lessonRow {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background 180ms var(--transition);
+  animation: fadeUp 0.3s var(--transition) both;
+}
+.lessonRow:last-child { border-bottom: none; }
+
+.lessonClickable { cursor: pointer; }
+.lessonClickable:hover { background: var(--surface-hover); }
+
+.lessonIcon {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--bg-elevated);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); flex-shrink: 0;
+}
+
+.lessonTitle { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .heroBody { grid-template-columns: 1fr; }
+  .enrollCard { position: static; }
+}
