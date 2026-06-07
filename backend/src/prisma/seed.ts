@@ -4,12 +4,13 @@ import bcrypt from "bcryptjs";
 async function main() {
   console.log("🚀 Iniciando seed...");
 
-  // Limpa dados antigos
+  // Limpa dados antigos (ordem respeita FK: dependentes primeiro)
   await prisma.certificate.deleteMany();
   await prisma.lessonProgress.deleteMany();
+  await prisma.enrollment.deleteMany();
   await prisma.lesson.deleteMany();
   await prisma.module.deleteMany();
-  await prisma.enrollment.deleteMany();
+  await prisma.course.deleteMany();
   await prisma.user.deleteMany();
 
   console.log("🧹 Dados antigos apagados.");

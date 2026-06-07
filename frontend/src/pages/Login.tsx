@@ -20,8 +20,9 @@ export default function Login() {
       const { data } = await api.post("/auth/login", { email, password });
       login(data.token, data.user);
       navigate(data.user.role === "INSTRUCTOR" ? "/instructor" : "/dashboard");
-    } catch {
-      setError("E-mail ou senha inválidos.");
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || err?.message || "E-mail ou senha inválidos.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
