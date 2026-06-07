@@ -3,24 +3,28 @@ import { CreateLessonDTO, UpdateLessonDTO } from "./lesson.dto";
 
 export class LessonService {
   async createLesson(data: CreateLessonDTO, instructorId: number) {
-    const moduleData = await prisma.module.findUnique({
-      where: { id: data.moduleId },
-      include: { course: true },
-    });
-
-    if (!moduleData) throw new Error("Module not found");
-
-    if (moduleData.course.instructorId !== instructorId) {
-      throw new Error("You are not the instructor of this course");
+    if (data.moduleId) {
+      const moduleData = await prisma.module.findUnique({
+        where: { id: data.moduleId },
+        include: { course: true },
+      });
+      if (!moduleData) throw new Error("Module not found");
+      if (moduleData.course.instructorId !== instructorId)
+        throw new Error("You are not the instructor of this course");
+    } else {
+      const course = await prisma.course.findUnique({ where: { id: data.courseId } });
+      if (!course) throw new Error("Course not found");
+      if (course.instructorId !== instructorId)
+        throw new Error("You are not the instructor of this course");
     }
 
     return prisma.lesson.create({
       data: {
         title: data.title,
         content: data.content,
-        videoUrl: data.videoUrl,
-        courseId: moduleData.courseId,
-        moduleId: data.moduleId,
+        videoUrl: data.videoUrl ?? "",
+        courseId: data.courseId,
+        moduleId: data.moduleId ?? null,
       },
     });
   }

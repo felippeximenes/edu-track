@@ -4,7 +4,8 @@ export const createLessonSchema = z.object({
   title: z.string().min(3),
   content: z.string().min(10),
   videoUrl: z.string().url().optional(),
-  moduleId: z.number(), // OBRIGATÓRIO
+  courseId: z.number(),
+  moduleId: z.number().optional(),
 });
 
 export const updateLessonSchema = z.object({
