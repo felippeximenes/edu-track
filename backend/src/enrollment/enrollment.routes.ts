@@ -13,7 +13,7 @@ router.post(
   controller.enroll
 );
 
-router.get("/user/:userId", controller.getByUser);
-router.get("/course/:courseId", controller.getByCourse);
+router.get("/user/:userId", authMiddleware, controller.getByUser);
+router.get("/course/:courseId", authMiddleware, controller.getByCourse);
 
 export default router;

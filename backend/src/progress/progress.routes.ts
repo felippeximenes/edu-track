@@ -9,14 +9,14 @@ const controller = new ProgressController();
 router.post(
   "/complete",
   authMiddleware,
-  requireRole("STUDENT"),
+  requireRole("STUDENT", "ADMIN"),
   controller.complete
 );
 
 router.get(
   "/course/:courseId",
   authMiddleware,
-  requireRole("STUDENT"),
+  requireRole("STUDENT", "ADMIN"),
   controller.getCourseProgress
 );
 

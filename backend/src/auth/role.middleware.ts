@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-export function requireRole(role: "INSTRUCTOR" | "STUDENT") {
+export function requireRole(...roles: ("INSTRUCTOR" | "STUDENT" | "ADMIN")[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
 
@@ -8,7 +8,7 @@ export function requireRole(role: "INSTRUCTOR" | "STUDENT") {
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    if (user.role !== role) {
+    if (!roles.includes(user.role)) {
       return res.status(403).json({ error: "Forbidden" });
     }
 
