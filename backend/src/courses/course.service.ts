@@ -31,7 +31,9 @@ export class CourseService {
       include: {
         instructor: true,
         lessons: true,
-        modules: true,
+        modules: {
+          include: { lessons: true },
+        },
       },
     });
   }
