@@ -58,7 +58,7 @@ export default function Dashboard() {
         <div className={styles.header}>
           <div>
             <h1 className={styles.title}>
-              Olá, <span className="gradient-text">{user?.name?.split(" ")[0]}</span> 👋
+              Olá, <span className="gradient-text">{user?.name?.split(" ")[0]}</span>
             </h1>
             <p className={styles.subtitle}>Acompanhe seu progresso e continue aprendendo</p>
           </div>
