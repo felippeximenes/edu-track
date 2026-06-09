@@ -13,8 +13,10 @@ import adminRoutes from "./admin/admin.routes";
 
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
+
+app.get("/health", (_req, res) => res.json({ status: "ok" }));
 
 app.use("/auth", authRoutes);
 app.use("/courses", courseRoutes);
@@ -30,6 +32,7 @@ app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: err.message || "Internal server error" });
 });
 
-app.listen(3001, () => {
-  console.log("Server running on port 3001");
+const PORT = Number(process.env.PORT) || 3001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
