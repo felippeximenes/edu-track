@@ -37,6 +37,7 @@ export default function InstructorPanel() {
       .finally(() => setLoading(false));
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { loadCourses(); }, []);
 
   function openModal(mode: ModalMode, courseId?: number) {
