@@ -34,18 +34,26 @@ export default function LessonPlayer() {
   const { id }   = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const [lesson, setLesson]       = useState<Lesson | null>(null);
-  const [loading, setLoading]     = useState(true);
-  const [completed, setCompleted] = useState(false);
-  const [marking, setMarking]     = useState(false);
+  const [lesson, setLesson]         = useState<Lesson | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [completed, setCompleted]   = useState(false);
+  const [marking, setMarking]       = useState(false);
+  const [nextLessonId, setNextLessonId] = useState<number | null>(null);
 
   useEffect(() => {
     api.get(`/lessons/${id}`)
-      .then(r => {
-        setLesson(r.data);
-        return api.get(`/progress/lesson/${id}`);
+      .then(async r => {
+        const lessonData = r.data;
+        setLesson(lessonData);
+        const [progRes, courseRes] = await Promise.all([
+          api.get(`/progress/lesson/${id}`),
+          api.get(`/courses/${lessonData.courseId}`),
+        ]);
+        setCompleted(progRes.data.completed);
+        const allLessons: { id: number }[] = courseRes.data.lessons;
+        const idx = allLessons.findIndex(l => l.id === lessonData.id);
+        setNextLessonId(idx >= 0 && idx < allLessons.length - 1 ? allLessons[idx + 1].id : null);
       })
-      .then(r => setCompleted(r.data.completed))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
@@ -106,9 +114,17 @@ export default function LessonPlayer() {
 
               <div className={styles.actions}>
                 {completed ? (
-                  <div className={styles.completedBadge}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    Aula concluída!
+                  <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
+                    <div className={styles.completedBadge}>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      Aula concluída!
+                    </div>
+                    {nextLessonId && (
+                      <button className={styles.completeBtn} onClick={() => navigate(`/lessons/${nextLessonId}`)}>
+                        Próxima aula
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <button className={styles.completeBtn} onClick={markComplete} disabled={marking}>
