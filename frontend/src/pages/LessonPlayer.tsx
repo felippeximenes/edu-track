@@ -40,7 +40,14 @@ export default function LessonPlayer() {
   const [marking, setMarking]     = useState(false);
 
   useEffect(() => {
-    api.get(`/lessons/${id}`).then(r => setLesson(r.data)).finally(() => setLoading(false));
+    api.get(`/lessons/${id}`)
+      .then(r => {
+        setLesson(r.data);
+        return api.get(`/progress/lesson/${id}`);
+      })
+      .then(r => setCompleted(r.data.completed))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, [id]);
 
   async function markComplete() {

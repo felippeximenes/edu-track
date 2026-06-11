@@ -22,6 +22,19 @@ export class ProgressController {
     }
   }
 
+  async getLessonProgress(req: Request, res: Response) {
+    try {
+      const userId   = (req as any).user.id;
+      const lessonId = Number(req.params.lessonId);
+      if (isNaN(lessonId)) return res.status(400).json({ error: "Invalid lessonId" });
+      const completed = await progressService.isLessonCompleted(userId, lessonId);
+      return res.json({ completed });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: "Failed to fetch lesson progress" });
+    }
+  }
+
   async getCourseProgress(req: Request, res: Response) {
     try {
       const userId = (req as any).user.id; // mesmo esquema do de cima

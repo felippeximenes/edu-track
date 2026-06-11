@@ -10,6 +10,11 @@ export class ProgressService {
     });
   }
 
+  async isLessonCompleted(userId: number, lessonId: number): Promise<boolean> {
+    const record = await prisma.lessonProgress.findFirst({ where: { userId, lessonId } });
+    return !!record;
+  }
+
   async getCourseProgress(userId: number, courseId: number) {
     const modules = await prisma.module.findMany({
       where: { courseId },

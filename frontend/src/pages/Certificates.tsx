@@ -18,7 +18,16 @@ export default function Certificates() {
   const [downloading, setDownloading] = useState<number | null>(null);
 
   useEffect(() => {
-    api.get("/certificates").then(r => setCerts(r.data)).finally(() => setLoading(false));
+    if (!user?.id) return;
+    api.get(`/enrollments/user/${user.id}`)
+      .then(r => {
+        const courseIds: number[] = r.data.map((e: any) => e.courseId);
+        return Promise.allSettled(courseIds.map(id => api.post(`/certificates/issue/${id}`)));
+      })
+      .catch(() => {})
+      .finally(() => {
+        api.get("/certificates").then(r => setCerts(r.data)).finally(() => setLoading(false));
+      });
   }, [user?.id]);
 
   async function downloadPdf(cert: Certificate) {
@@ -117,7 +126,7 @@ export default function Certificates() {
                     }
                   </button>
                   <a
-                    href={`http://localhost:3001/certificates/public/${cert.code}`}
+                    href={`/api/certificates/public/${cert.code}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className={styles.verifyBtn}

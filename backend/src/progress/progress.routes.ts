@@ -14,6 +14,13 @@ router.post(
 );
 
 router.get(
+  "/lesson/:lessonId",
+  authMiddleware,
+  requireRole("STUDENT", "ADMIN"),
+  controller.getLessonProgress
+);
+
+router.get(
   "/course/:courseId",
   authMiddleware,
   requireRole("STUDENT", "ADMIN"),
