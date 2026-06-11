@@ -43,17 +43,21 @@ export class ProgressService {
     const progressPercentage =
       totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
 
+    const completedLessonIds = modules
+      .flatMap((m) => m.lessons)
+      .filter((l) => l.progress.length > 0)
+      .map((l) => l.id);
+
     return {
       courseId,
       completedLessons,
       totalLessons,
       progressPercentage,
+      completedLessonIds,
       modules: modules.map((m) => ({
         moduleId: m.id,
         title: m.title,
-        completedLessons: m.lessons.filter(
-          (l) => l.progress.length > 0
-        ).length,
+        completedLessons: m.lessons.filter((l) => l.progress.length > 0).length,
         totalLessons: m.lessons.length,
       })),
     };

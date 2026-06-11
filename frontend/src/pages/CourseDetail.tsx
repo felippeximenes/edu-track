@@ -37,7 +37,8 @@ export default function CourseDetail() {
   const [enrolled, setEnrolled]   = useState(false);
   const [loading, setLoading]     = useState(true);
   const [enrolling, setEnrolling] = useState(false);
-  const [openMods, setOpenMods]   = useState<Set<number>>(new Set());
+  const [openMods, setOpenMods]         = useState<Set<number>>(new Set());
+  const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     async function load() {
@@ -49,7 +50,11 @@ export default function CourseDetail() {
         setCourse(courseRes.data);
         const isEnrolled = enrollRes.data.some((e: { courseId: number }) => e.courseId === Number(id));
         setEnrolled(isEnrolled);
-        if (isEnrolled) setOpenMods(new Set(courseRes.data.modules.map((m: Module) => m.id)));
+        if (isEnrolled) {
+          setOpenMods(new Set(courseRes.data.modules.map((m: Module) => m.id)));
+          const prog = await api.get(`/progress/course/${id}`);
+          setCompletedIds(new Set(prog.data.completedLessonIds));
+        }
       } finally {
         setLoading(false);
       }
@@ -192,12 +197,15 @@ export default function CourseDetail() {
                 {mod.lessons.map((lesson, j) => (
                   <div
                     key={lesson.id}
-                    className={`${styles.lessonRow} ${enrolled ? styles.lessonClickable : ""}`}
+                    className={`${styles.lessonRow} ${enrolled ? styles.lessonClickable : ""} ${completedIds.has(lesson.id) ? styles.lessonDone : ""}`}
                     onClick={() => enrolled && navigate(`/lessons/${lesson.id}`)}
                     style={{ animationDelay: `${j * 40}ms` }}
                   >
                     <div className={styles.lessonIcon}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      {completedIds.has(lesson.id)
+                        ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                      }
                     </div>
                     <span className={styles.lessonTitle}>{lesson.title}</span>
                     {!enrolled && (
