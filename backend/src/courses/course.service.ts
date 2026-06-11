@@ -30,9 +30,9 @@ export class CourseService {
       where: { id },
       include: {
         instructor: true,
-        lessons: true,
+        lessons: { orderBy: { id: "asc" } },
         modules: {
-          include: { lessons: true },
+          include: { lessons: { orderBy: { id: "asc" } } },
         },
       },
     });
