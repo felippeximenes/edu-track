@@ -2,12 +2,12 @@ import { z } from "zod";
 
 export const createCourseSchema = z.object({
   title: z.string().min(3),
-  description: z.string().min(10),
+  description: z.string().min(1),
 });
 
 export const updateCourseSchema = z.object({
   title: z.string().min(3).optional(),
-  description: z.string().min(10).optional(),
+  description: z.string().min(1).optional(),
 });
 
 export type CreateCourseDTO = z.infer<typeof createCourseSchema>;
