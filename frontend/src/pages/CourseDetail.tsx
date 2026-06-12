@@ -43,24 +43,27 @@ export default function CourseDetail() {
   useEffect(() => {
     async function load() {
       try {
-        const [courseRes, enrollRes] = await Promise.all([
-          api.get(`/courses/${id}`),
-          api.get(`/enrollments/user/${user?.id}`),
-        ]);
+        const courseRes = await api.get(`/courses/${id}`);
         setCourse(courseRes.data);
-        const isEnrolled = enrollRes.data.some((e: { courseId: number }) => e.courseId === Number(id));
-        setEnrolled(isEnrolled);
-        if (isEnrolled) {
+
+        if (user?.role === "INSTRUCTOR") {
           setOpenMods(new Set(courseRes.data.modules.map((m: Module) => m.id)));
-          const prog = await api.get(`/progress/course/${id}`);
-          setCompletedIds(new Set(prog.data.completedLessonIds));
+        } else {
+          const enrollRes = await api.get(`/enrollments/user/${user?.id}`);
+          const isEnrolled = enrollRes.data.some((e: { courseId: number }) => e.courseId === Number(id));
+          setEnrolled(isEnrolled);
+          if (isEnrolled) {
+            setOpenMods(new Set(courseRes.data.modules.map((m: Module) => m.id)));
+            const prog = await api.get(`/progress/course/${id}`);
+            setCompletedIds(new Set(prog.data.completedLessonIds));
+          }
         }
       } finally {
         setLoading(false);
       }
     }
     load();
-  }, [id, user?.id]);
+  }, [id, user?.id, user?.role]);
 
   async function handleEnroll() {
     setEnrolling(true);
@@ -139,32 +142,48 @@ export default function CourseDetail() {
               </div>
             </div>
 
-            {/* Enrollment card */}
+            {/* Enrollment / Instructor card */}
             <div className={styles.enrollCard}>
-              <div className={styles.enrollIcon}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-              </div>
-              <p className={styles.enrollTitle}>
-                {enrolled ? "Você está matriculado" : "Comece a aprender hoje"}
-              </p>
-              <p className={styles.enrollSub}>
-                {enrolled
-                  ? "Continue de onde parou"
-                  : "Acesse todas as aulas e materiais"}
-              </p>
-
-              {enrolled ? (
-                <button
-                  className={`${styles.enrollBtn} ${styles.enrollBtnActive}`}
-                  onClick={() => course.lessons[0] && navigate(`/lessons/${course.lessons[0].id}`)}
-                >
-                  Continuar curso
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </button>
+              {user?.role === "INSTRUCTOR" ? (
+                <>
+                  <div className={styles.enrollIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  </div>
+                  <p className={styles.enrollTitle}>Você é o instrutor</p>
+                  <p className={styles.enrollSub}>Gerencie aulas, módulos e alunos no painel</p>
+                  <button
+                    className={`${styles.enrollBtn} ${styles.enrollBtnActive}`}
+                    onClick={() => navigate("/instructor")}
+                  >
+                    Ir para o painel
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                  </button>
+                </>
               ) : (
-                <button className={styles.enrollBtn} onClick={handleEnroll} disabled={enrolling}>
-                  {enrolling ? <span className={styles.btnSpinner} /> : "Matricular-se gratuitamente"}
-                </button>
+                <>
+                  <div className={styles.enrollIcon}>
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                  </div>
+                  <p className={styles.enrollTitle}>
+                    {enrolled ? "Você está matriculado" : "Comece a aprender hoje"}
+                  </p>
+                  <p className={styles.enrollSub}>
+                    {enrolled ? "Continue de onde parou" : "Acesse todas as aulas e materiais"}
+                  </p>
+                  {enrolled ? (
+                    <button
+                      className={`${styles.enrollBtn} ${styles.enrollBtnActive}`}
+                      onClick={() => course.lessons[0] && navigate(`/lessons/${course.lessons[0].id}`)}
+                    >
+                      Continuar curso
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                  ) : (
+                    <button className={styles.enrollBtn} onClick={handleEnroll} disabled={enrolling}>
+                      {enrolling ? <span className={styles.btnSpinner} /> : "Matricular-se gratuitamente"}
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
