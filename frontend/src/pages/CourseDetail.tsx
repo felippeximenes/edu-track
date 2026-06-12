@@ -40,6 +40,10 @@ export default function CourseDetail() {
   const [openMods, setOpenMods]         = useState<Set<number>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<number>>(new Set());
 
+  const [addModal, setAddModal]   = useState<{ moduleId: number; moduleName: string } | null>(null);
+  const [newLesson, setNewLesson] = useState({ title: "", content: "", videoUrl: "" });
+  const [saving, setSaving]       = useState(false);
+
   useEffect(() => {
     async function load() {
       try {
@@ -75,6 +79,39 @@ export default function CourseDetail() {
       alert(err.response?.data?.error || "Erro ao se matricular.");
     } finally {
       setEnrolling(false);
+    }
+  }
+
+  async function handleAddLesson() {
+    if (!addModal || !course) return;
+    setSaving(true);
+    try {
+      await api.post("/lessons", {
+        title: newLesson.title,
+        content: newLesson.content,
+        videoUrl: newLesson.videoUrl || undefined,
+        courseId: course.id,
+        moduleId: addModal.moduleId,
+      });
+      const courseRes = await api.get(`/courses/${id}`);
+      setCourse(courseRes.data);
+      setAddModal(null);
+      setNewLesson({ title: "", content: "", videoUrl: "" });
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Erro ao criar aula.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDeleteLesson(lessonId: number) {
+    if (!window.confirm("Remover esta aula do curso?")) return;
+    try {
+      await api.delete(`/lessons/${lessonId}`);
+      const courseRes = await api.get(`/courses/${id}`);
+      setCourse(courseRes.data);
+    } catch (err: any) {
+      alert(err.response?.data?.error || "Erro ao remover aula.");
     }
   }
 
@@ -190,6 +227,57 @@ export default function CourseDetail() {
         </div>
       </div>
 
+      {/* Add lesson modal */}
+      {addModal && (
+        <div className={styles.modalOverlay} onClick={() => setAddModal(null)}>
+          <div className={styles.modal} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Nova aula — {addModal.moduleName}</h3>
+              <button className={styles.modalCloseBtn} onClick={() => setAddModal(null)}>×</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Título *</label>
+                <input
+                  className={styles.formInput}
+                  placeholder="Ex: Introdução ao tema"
+                  value={newLesson.title}
+                  onChange={e => setNewLesson(p => ({ ...p, title: e.target.value }))}
+                />
+              </div>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>Descrição *</label>
+                <textarea
+                  className={styles.formTextarea}
+                  placeholder="Descreva o conteúdo desta aula"
+                  value={newLesson.content}
+                  onChange={e => setNewLesson(p => ({ ...p, content: e.target.value }))}
+                />
+              </div>
+              <div className={styles.formField}>
+                <label className={styles.formLabel}>URL do vídeo (opcional)</label>
+                <input
+                  className={styles.formInput}
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={newLesson.videoUrl}
+                  onChange={e => setNewLesson(p => ({ ...p, videoUrl: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className={styles.modalFooter}>
+              <button className={styles.modalCancelBtn} onClick={() => setAddModal(null)}>Cancelar</button>
+              <button
+                className={styles.modalSaveBtn}
+                onClick={handleAddLesson}
+                disabled={saving || !newLesson.title.trim() || !newLesson.content.trim()}
+              >
+                {saving ? <span className={styles.btnSpinner} /> : "Criar aula"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className={styles.content}>
         {/* Modules */}
@@ -227,13 +315,30 @@ export default function CourseDetail() {
                       }
                     </div>
                     <span className={styles.lessonTitle}>{lesson.title}</span>
-                    {!enrolled && (
+                    {user?.role === "INSTRUCTOR" ? (
+                      <button
+                        className={styles.deleteLessonBtn}
+                        onClick={e => { e.stopPropagation(); handleDeleteLesson(lesson.id); }}
+                        title="Remover aula"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      </button>
+                    ) : !enrolled && (
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: "auto", color: "var(--text-muted)" }}>
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                       </svg>
                     )}
                   </div>
                 ))}
+                {user?.role === "INSTRUCTOR" && (
+                  <button
+                    className={styles.addLessonBtn}
+                    onClick={() => setAddModal({ moduleId: mod.id, moduleName: mod.title })}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    Adicionar aula
+                  </button>
+                )}
               </div>
             )}
           </div>

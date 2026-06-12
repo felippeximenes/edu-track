@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const createLessonSchema = z.object({
   title: z.string().min(3),
-  content: z.string().min(10),
+  content: z.string().min(1),
   videoUrl: z.string().url().optional(),
   courseId: z.number(),
   moduleId: z.number().optional(),
@@ -10,7 +10,7 @@ export const createLessonSchema = z.object({
 
 export const updateLessonSchema = z.object({
   title: z.string().min(3).optional(),
-  content: z.string().min(10).optional(),
+  content: z.string().min(1).optional(),
   videoUrl: z.string().url().optional(),
   moduleId: z.number().optional(),
 });

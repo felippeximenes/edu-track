@@ -220,6 +220,109 @@
 
 .lessonTitle { font-size: 14px; color: var(--text-primary); line-height: 1.4; }
 
+.lessonDone .lessonTitle { color: var(--text-muted); text-decoration: line-through; }
+
+/* Instructor controls */
+.deleteLessonBtn {
+  margin-left: auto; flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 150ms, color 150ms, border-color 150ms;
+}
+.deleteLessonBtn:hover {
+  background: rgba(239,68,68,0.1);
+  border-color: rgba(239,68,68,0.25);
+  color: #f87171;
+}
+
+.addLessonBtn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; width: 100%;
+  background: transparent; border: none;
+  border-top: 1px dashed var(--border);
+  color: var(--text-muted); font-size: 13px; font-weight: 500;
+  font-family: inherit; cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.addLessonBtn:hover { background: rgba(99,102,241,0.06); color: var(--primary); }
+
+/* Modal */
+.modalOverlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s var(--transition);
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal {
+  background: var(--bg-base); border: 1px solid var(--border);
+  border-radius: var(--radius-xl); width: 100%; max-width: 500px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  animation: slideUp 0.25s var(--transition);
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modalHeader {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.modalHeader h3 { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+.modalCloseBtn {
+  background: transparent; border: none;
+  color: var(--text-muted); font-size: 22px; line-height: 1;
+  padding: 2px 8px; border-radius: var(--radius-sm); cursor: pointer;
+  transition: background 150ms, color 150ms;
+}
+.modalCloseBtn:hover { background: var(--surface-hover); color: var(--text-primary); }
+
+.modalBody { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+.formField { display: flex; flex-direction: column; gap: 7px; }
+.formLabel { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+.formInput, .formTextarea {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-primary);
+  font-size: 14px; font-family: inherit; padding: 10px 14px; outline: none;
+  transition: border-color 180ms, box-shadow 180ms;
+}
+.formInput:focus, .formTextarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.formInput::placeholder, .formTextarea::placeholder { color: var(--text-muted); }
+.formTextarea { resize: vertical; min-height: 80px; }
+
+.modalFooter {
+  display: flex; gap: 10px; justify-content: flex-end;
+  padding: 16px 24px; border-top: 1px solid var(--border);
+}
+.modalCancelBtn {
+  padding: 9px 18px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); color: var(--text-secondary);
+  font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit;
+  transition: background 150ms, color 150ms;
+}
+.modalCancelBtn:hover { background: var(--surface-hover); color: var(--text-primary); }
+.modalSaveBtn {
+  padding: 9px 20px; background: var(--gradient-brand); border: none;
+  border-radius: var(--radius); color: #fff;
+  font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  min-width: 110px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px var(--primary-glow);
+  transition: opacity 150ms;
+}
+.modalSaveBtn:hover:not(:disabled) { opacity: 0.88; }
+.modalSaveBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .heroBody { grid-template-columns: 1fr; }
