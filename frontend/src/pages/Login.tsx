@@ -4,11 +4,17 @@ import { useAuth } from "../contexts/AuthContext";
 import { api } from "../api/axios";
 import styles from "./Login.module.css";
 
+const DEMO_ACCOUNTS = {
+  student:    { email: "felippe@example.com", password: "123456" },
+  instructor: { email: "prof@example.com",    password: "123456" },
+};
+
 export default function Login() {
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [error, setError]       = useState("");
   const [loading, setLoading]   = useState(false);
+  const [demoLoading, setDemoLoading] = useState<"student" | "instructor" | null>(null);
   const { login } = useAuth();
   const navigate  = useNavigate();
 
@@ -25,6 +31,23 @@ export default function Login() {
       setError(msg);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDemo(role: "student" | "instructor") {
+    setError("");
+    setDemoLoading(role);
+    const creds = DEMO_ACCOUNTS[role];
+    setEmail(creds.email);
+    setPassword(creds.password);
+    try {
+      const { data } = await api.post("/auth/login", creds);
+      login(data.token, data.user);
+      navigate(data.user.role === "INSTRUCTOR" ? "/instructor" : "/dashboard");
+    } catch (err: any) {
+      setError("Erro ao entrar com conta demo. Tente novamente.");
+    } finally {
+      setDemoLoading(null);
     }
   }
 
@@ -89,6 +112,37 @@ export default function Login() {
             {loading ? <span className={styles.spinner} /> : "Entrar"}
           </button>
         </form>
+
+        <div className={styles.divider}>
+          <span>ou experimente o demo</span>
+        </div>
+
+        <div className={styles.demoRow}>
+          <button
+            className={styles.demoBtn}
+            onClick={() => handleDemo("student")}
+            disabled={demoLoading !== null}
+          >
+            {demoLoading === "student" ? <span className={styles.spinnerDark} /> : (
+              <>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Entrar como Aluno
+              </>
+            )}
+          </button>
+          <button
+            className={`${styles.demoBtn} ${styles.demoBtnInstructor}`}
+            onClick={() => handleDemo("instructor")}
+            disabled={demoLoading !== null}
+          >
+            {demoLoading === "instructor" ? <span className={styles.spinnerDark} /> : (
+              <>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Entrar como Instrutor
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
