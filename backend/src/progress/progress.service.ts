@@ -2,12 +2,9 @@ import prisma from "../config/prismaClient";
 
 export class ProgressService {
   async complete(userId: number, lessonId: number) {
-    return prisma.lessonProgress.create({
-      data: {
-        userId,
-        lessonId,
-      },
-    });
+    const existing = await prisma.lessonProgress.findFirst({ where: { userId, lessonId } });
+    if (existing) return existing;
+    return prisma.lessonProgress.create({ data: { userId, lessonId } });
   }
 
   async isLessonCompleted(userId: number, lessonId: number): Promise<boolean> {

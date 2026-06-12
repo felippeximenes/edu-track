@@ -9,18 +9,23 @@ import { certificateHTML } from "./certificateTemplate";
 
 export class CertificateService {
   async hasCompletedCourse(userId: number, courseId: number) {
-    const totalLessons = await prisma.lesson.count({
+    const lessons = await prisma.lesson.findMany({
       where: { courseId },
+      select: { id: true },
     });
 
-    const completedLessons = await prisma.lessonProgress.count({
+    const totalLessons = lessons.length;
+    if (totalLessons === 0) return false;
+
+    const completed = await prisma.lessonProgress.groupBy({
+      by: ["lessonId"],
       where: {
         userId,
-        lesson: { courseId },
+        lessonId: { in: lessons.map((l) => l.id) },
       },
     });
 
-    return completedLessons === totalLessons;
+    return completed.length === totalLessons;
   }
 
   async issueCertificate(userId: number, courseId: number) {
