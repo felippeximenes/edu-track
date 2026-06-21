@@ -1,6 +1,6 @@
 # EduTrack
 
-A learning management system (LMS) built with Node.js, Express, React, and MySQL. Students can enroll in courses, watch video lessons, track progress, and earn certificates with QR codes. Instructors manage courses, modules, and lessons through a dedicated panel and directly from the course detail page. Admins have full user management and platform statistics.
+A learning management system (LMS) built with Node.js, Express, React, and MySQL. Students can enroll in courses, watch video lessons, track progress, and earn certificates with QR codes. Instructors manage courses, modules, and lessons through a dedicated panel and directly from the course detail page. Admins have full user management and platform statistics!
 
 **Live demo:** [edu-track-blond-eta.vercel.app](https://edu-track-blond-eta.vercel.app)
 
