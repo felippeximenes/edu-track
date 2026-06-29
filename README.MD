@@ -12,6 +12,7 @@ A learning management system (LMS) built with Node.js, Express, React, and MySQL
 - [Architecture Overview](#architecture-overview)
 - [Features](#features)
 - [Demo Access](#demo-access)
+- [Screenshots](#screenshots)
 - [Database Schema](#database-schema)
 - [API Reference](#api-reference)
 - [Project Structure](#project-structure)
@@ -97,6 +98,38 @@ The login page includes one-click demo buttons — no registration needed:
 | STUDENT | felippe@example.com | 123456 |
 
 The student account comes pre-enrolled in the sample course with full progress and an issued certificate.
+
+---
+
+## Screenshots
+
+### Login
+![Login page](docs/screenshots/01-login.png)
+
+### Catálogo de Cursos
+![Course catalog](docs/screenshots/02-courses-catalog.png)
+
+### Detalhe do Curso — Visão do Aluno
+> Aulas com checkmarks indicando conclusão
+![Course detail student view](docs/screenshots/03-course-detail-student.png)
+
+### Player de Aula
+> Botão "Próxima aula" aparece após concluir a aula atual
+![Lesson player](docs/screenshots/04-lesson-player.png)
+
+### Dashboard do Aluno
+![Student dashboard](docs/screenshots/05-dashboard.png)
+
+### Certificados
+> Emissão automática ao atingir 100% do curso; download em PDF com QR Code
+![Certificates](docs/screenshots/06-certificates.png)
+
+### Painel do Instrutor
+![Instructor panel](docs/screenshots/07-instructor-panel.png)
+
+### Detalhe do Curso — Visão do Instrutor
+> Instrutor vê controles de gerenciamento de aulas em vez do card de matrícula
+![Course detail instructor view](docs/screenshots/08-course-detail-instructor.png)
 
 ---
 
